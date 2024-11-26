@@ -2,10 +2,14 @@ package com.product.service;
 
 import com.product.dao.ProductRepository;
 import com.product.entity.Product;
+import com.product.utility.dto.ProductRequestDTO;
+import com.product.utility.dto.ProductResponseDTO;
+import com.product.utility.mapper.ProductMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -17,24 +21,29 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public Product saveProduct(Product product) {
-        return productRepository.save(product);
+    public ProductResponseDTO saveProduct(ProductRequestDTO productRequestDTO) {
+
+       Product product = ProductMapper.toEntity(productRequestDTO);
+        Product saveProduct = productRepository.save(product);
+        return ProductMapper.toResponseDTO(saveProduct);
     }
 
-    public Optional<Product> getProductById(Long id) {
-        return productRepository.findById(id);
+    public Optional<ProductResponseDTO> getProductById(Long id) {
+        return productRepository.findById(id).map(ProductMapper::toResponseDTO);
     }
 
-    public List<Product> getAllProducts() {
-        return productRepository.findAll();
+    public List<ProductResponseDTO> getAllProducts() {
+
+        return productRepository.findAll().stream().map(ProductMapper::toResponseDTO).collect(Collectors.toList());
     }
 
-    public Optional<Product> updateProduct(Long id, Product productDetails) {
+    public Optional<ProductResponseDTO> updateProduct(Long id, ProductRequestDTO productDetails) {
         return productRepository.findById(id).map(existingProduct -> {
             existingProduct.setName(productDetails.getName());
             existingProduct.setDescription(productDetails.getDescription());
             existingProduct.setPrice(productDetails.getPrice());
-            return productRepository.save(existingProduct);
+            Product updatedProduct = productRepository.save(existingProduct);
+            return ProductMapper.toResponseDTO(updatedProduct);
         });
     }
 

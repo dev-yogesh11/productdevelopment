@@ -2,6 +2,8 @@ package com.product.controller;
 
 import com.product.entity.Product;
 import com.product.service.ProductService;
+import com.product.utility.dto.ProductRequestDTO;
+import com.product.utility.dto.ProductResponseDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,29 +22,29 @@ public class ProductController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
+    public ResponseEntity<ProductResponseDTO> createProduct(@RequestBody ProductRequestDTO productRequestDTO) {
 
-       Product saveProduct = productService.saveProduct(product);
+        ProductResponseDTO saveProduct = productService.saveProduct(productRequestDTO);
         return  new ResponseEntity<>(saveProduct, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ProductResponseDTO> getProductById(@PathVariable Long id) {
 
-      Optional<Product> product =  productService.getProductById(id);
+      Optional<ProductResponseDTO> product =  productService.getProductById(id);
 
         return product.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
+    public ResponseEntity<List<ProductResponseDTO>> getAllProducts() {
 
-        List<Product> products = productService.getAllProducts();
+        List<ProductResponseDTO> products = productService.getAllProducts();
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product productDetails) {
+    public ResponseEntity<ProductResponseDTO> updateProduct(@PathVariable Long id, @RequestBody ProductRequestDTO productDetails) {
 
         return productService.updateProduct(id, productDetails).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -52,5 +54,4 @@ public class ProductController {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
-
 }
